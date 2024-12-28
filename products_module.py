@@ -1,26 +1,26 @@
 class Product:
     def __init__(self, name, price, quantity):
-        if not name:
-            raise ValueError("Product name cannot be empty.")
-        if price < 0:
-            raise ValueError("Price cannot be negative.")
-        if quantity < 0:
-            raise ValueError("Quantity cannot be negative.")
-
         self.name = name
         self.price = price
         self.quantity = quantity
+        self.promotion = None  # Initially no promotion
 
-    def is_active(self):
-        return self.quantity > 0
+    def set_promotion(self, promotion):
+        self.promotion = promotion
 
-    def reduce_quantity(self, quantity):
-        if quantity > self.quantity:
-            raise ValueError("Not enough quantity available.")
-        self.quantity -= quantity
+    def get_promotion(self):
+        return self.promotion
 
     def show(self):
-        return f"{self.name} - ${self.price:.2f}, Quantity: {self.quantity}"
+        promotion_info = f"Promotion: {self.promotion.name}" if self.promotion else "No promotion"
+        return f"{self.name} - ${self.price} - Quantity: {self.quantity} - {promotion_info}"
+
+    def buy(self, quantity):
+        if self.promotion:
+            price = self.promotion.apply_promotion(self, quantity)
+        else:
+            price = self.price * quantity
+        return price
 
 
 class NonStockedProduct(Product):

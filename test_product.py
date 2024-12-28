@@ -25,3 +25,4 @@ def test_non_stocked_product():
 def test_limited_product():
     product = LimitedProduct("Shipping", price=10, quantity=250, maximum=1)
     assert product.maximum == 1  # Should only allow one purchase per order
+
