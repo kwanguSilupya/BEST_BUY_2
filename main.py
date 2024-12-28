@@ -1,5 +1,5 @@
-from products_module import Product  # Import Product class from products_module.py
-from store import Store  # Import Store class from store.py
+from products_module import Product, NonStockedProduct, LimitedProduct
+from store import Store
 
 
 def display_menu():
@@ -100,11 +100,13 @@ def start(store: Store):
 
 
 if __name__ == "__main__":
-    # Setup initial stock of inventory
+    # setup initial stock of inventory
     product_list = [
         Product("MacBook Air M2", price=1450, quantity=100),
         Product("Bose QuietComfort Earbuds", price=250, quantity=500),
         Product("Google Pixel 7", price=500, quantity=250),
+        NonStockedProduct("Windows License", price=125),
+        LimitedProduct("Shipping", price=10, quantity=250, maximum=1),
     ]
     best_buy = Store(product_list)
 
