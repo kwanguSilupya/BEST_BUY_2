@@ -1,18 +1,23 @@
-from products import Product
+class Product:
+    def __init__(self, name, price, quantity):
+        if not name:
+            raise ValueError("Product name cannot be empty.")
+        if price < 0:
+            raise ValueError("Price cannot be negative.")
+        if quantity < 0:
+            raise ValueError("Quantity cannot be negative.")
 
-class Store:
-    def __init__(self, products):
-        self.products = products
+        self.name = name
+        self.price = price
+        self.quantity = quantity
 
-    def get_all_products(self):
-        return [product for product in self.products if product.is_active()]
+    def is_active(self):
+        return self.quantity > 0
 
-    def get_total_quantity(self):
-        return sum(product.quantity for product in self.products)
+    def reduce_quantity(self, quantity):
+        if quantity > self.quantity:
+            raise ValueError("Not enough quantity available.")
+        self.quantity -= quantity
 
-    def order(self, shopping_list):
-        total_price = 0
-        for product, quantity in shopping_list:
-            product.reduce_quantity(quantity)
-            total_price += product.price * quantity
-        return total_price
+    def show(self):
+        return f"{self.name} - ${self.price:.2f}, Quantity: {self.quantity}"
