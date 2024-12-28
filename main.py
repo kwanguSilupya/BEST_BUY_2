@@ -3,6 +3,70 @@ from store import Store
 from promotions import SecondHalfPrice, ThirdOneFree, PercentDiscount
 
 
+class Product:
+    def __init__(self, name, price, quantity=0, maximum=None):
+        self.name = name
+        self._price = price
+        self.quantity = quantity
+        self.maximum = maximum
+        self.promotion = None
+
+    @property
+    def price(self):
+        return self._price
+
+    @price.setter
+    def price(self, value):
+        if value < 0:
+            raise ValueError("Price cannot be negative.")
+        self._price = value
+
+    def set_promotion(self, promotion):
+        self.promotion = promotion
+
+    def __str__(self):
+        return f"{self.name}, Price: ${self.price} Quantity:{self.quantity}"
+
+    def is_active(self):
+        """Assumes the product is active if quantity is greater than 0."""
+        return self.quantity > 0
+
+    def __lt__(self, other):
+        """Less than comparison based on price."""
+        if not isinstance(other, Product):
+            return NotImplemented
+        return self.price < other.price
+
+    def __gt__(self, other):
+        """Greater than comparison based on price."""
+        if not isinstance(other, Product):
+            return NotImplemented
+        return self.price > other.price
+
+    def __eq__(self, other):
+        """Equal comparison based on price."""
+        if not isinstance(other, Product):
+            return NotImplemented
+        return self.price == other.price
+
+
+class NonStockedProduct(Product):
+    def __init__(self, name, price):
+        super().__init__(name, price, quantity=0)  # Non-stocked items have no quantity
+
+    def __str__(self):
+        return f"{self.name}, Price: ${self.price} (Non-stocked product)"
+
+
+class LimitedProduct(Product):
+    def __init__(self, name, price, quantity, maximum):
+        super().__init__(name, price, quantity, maximum)
+        self.maximum = maximum
+
+    def __str__(self):
+        return f"{self.name}, Price: ${self.price} Quantity:{self.quantity} (Max: {self.maximum})"
+
+
 def display_menu():
     """
     Displays the main menu to the user.
@@ -23,8 +87,8 @@ def list_products(store: Store):
         print("No products available in the store.")
     else:
         print("\nAvailable Products:")
-        for i, product in enumerate(products, 1):
-            print(f"{i}. {product.show()}")
+        for i, item in enumerate(products, 1):  # Changed 'product' to 'item' here to avoid confusion
+            print(f"{i}. {item}")  # Calls __str__ method for each product
 
 
 def show_total_quantity(store: Store):
@@ -100,6 +164,26 @@ def start(store: Store):
         print("\n\nProgram interrupted. Exiting... Goodbye!")
 
 
+class Store:
+    def __init__(self, products):
+        self.products = products
+
+    def get_all_products(self):
+        """Returns all active products"""
+        return [product for product in self.products if product.is_active()]
+
+    def get_total_quantity(self):
+        """Returns the total quantity of all products in the store"""
+        return sum(product.quantity for product in self.products)
+
+    def order(self, shopping_list):
+        """Handles an order"""
+        total_price = 0
+        for product, quantity in shopping_list:
+            total_price += product.price * quantity
+        return total_price
+
+
 if __name__ == "__main__":
     # setup initial stock of inventory
     product_list = [
@@ -122,13 +206,6 @@ if __name__ == "__main__":
 
     # Create a store instance
     best_buy = Store(product_list)
-
-    # Uncomment this section for testing purposes
-    # print("\nTesting the promotions:")
-    # for product in product_list:
-    #     print(product.show())  # Show product details and promotion
-    #     quantity = 2
-    #     print(f"Total price for {quantity} items: ${product.buy(quantity):.2f}\n")
 
     # Start the interactive menu
     start(best_buy)

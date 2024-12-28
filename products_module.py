@@ -1,30 +1,37 @@
 class Product:
-    def __init__(self, name, price, quantity):
+    def __init__(self, name, price, quantity=0, maximum=None):
+        if not name or name.strip() == "":
+            raise ValueError("Product name cannot be empty.")
+        if price < 0:
+            raise ValueError("Price cannot be negative.")
+
         self.name = name
-        self.price = price
+        self._price = price
         self.quantity = quantity
+        self.maximum = maximum
         self.promotion = None
 
-    def is_active(self):
-        """
-        Returns True if the product is available for sale.
-        """
-        return self.quantity > 0
+    @property
+    def price(self):
+        return self._price
+
+    @price.setter
+    def price(self, value):
+        if value < 0:
+            raise ValueError("Price cannot be negative.")
+        self._price = value
 
     def set_promotion(self, promotion):
         self.promotion = promotion
 
-    def show(self):
-        promo_text = f"Promotion: {self.promotion.name}" if self.promotion else "No promotion"
-        return f"{self.name} - ${self.price} - Quantity: {self.quantity} - {promo_text}"
+    def __str__(self):
+        return f"{self.name}, Price: ${self.price} Quantity:{self.quantity}"
 
-    def buy(self, quantity):
-        if quantity > self.quantity:
-            raise ValueError("Insufficient stock!")
-        self.quantity -= quantity
-        if self.promotion:
-            return self.promotion.apply_promotion(self.price, quantity)
-        return self.price * quantity
+    def is_active(self):
+        """Assumes the product is active if quantity is greater than 0."""
+        return self.quantity > 0
+
+# Other classes like NonStockedProduct and LimitedProduct remain unchanged.
 
 
 class NonStockedProduct(Product):

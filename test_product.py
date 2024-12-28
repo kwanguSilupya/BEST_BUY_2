@@ -10,10 +10,12 @@ def test_create_product():
 
 
 def test_create_product_with_invalid_details():
-    with pytest.raises(ValueError):
+    # Test for empty product name
+    with pytest.raises(ValueError, match="Product name cannot be empty."):
         Product("", price=1450, quantity=100)
 
-    with pytest.raises(ValueError):
+    # Test for negative price
+    with pytest.raises(ValueError, match="Price cannot be negative."):
         Product("MacBook Air M2", price=-10, quantity=100)
 
 
@@ -25,4 +27,3 @@ def test_non_stocked_product():
 def test_limited_product():
     product = LimitedProduct("Shipping", price=10, quantity=250, maximum=1)
     assert product.maximum == 1  # Should only allow one purchase per order
-
